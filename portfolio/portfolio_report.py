@@ -8,11 +8,11 @@ def read_portfolio(filename):
         reader = csv.DictReader(file)
 
         for row in reader:
-            ordered = OrderedDict()
-            ordered["symbol"] = row["symbol"]
-            ordered["units"] = row["units"]
-            ordered["cost"] = row["cost"]
+            item = OrderedDict()
+            item["symbol"] = row["symbol"]
+            item["units"] = row["units"]
+            item["cost"] = row["cost"]
 
-            data.append(ordered)
+            data.append(item)
 
     return data
