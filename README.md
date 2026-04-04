@@ -1,55 +1,63 @@
 # Stock Portfolio Performance Report Generator
 
-## 📌 Description
-
-This project generates a stock portfolio performance report using live market data.
-
-The program reads a CSV file containing stock holdings, fetches the latest prices from the IEX API, and produces a new CSV report showing performance metrics such as gain/loss and percentage change.
+This project generates a performance report for a stock portfolio using live market data.
 
 ---
 
-## 🚀 Features
+## 📌 Description
 
-* Read portfolio data from CSV file
-* Fetch latest stock prices using API
-* Calculate:
+The program reads a CSV file containing stock holdings and generates a report showing:
 
-  * Book value
-  * Market value
-  * Gain/Loss
-  * Percentage change
-* Generate output CSV report
-* Command-line tool (CLI)
+* Latest stock price
+* Book value
+* Market value
+* Gain or loss
+* Percentage change
 
 ---
 
 ## 📂 Project Structure
 
 ```
-portfolio/
+portfolio_project/
 │
-├── __init__.py
-├── reader.py
-├── api.py
-├── calculator.py
-├── writer.py
-├── main.py
+├── portfolio/
+│   ├── __init__.py
+│   ├── portfolio_report.py
+│
+├── tests/
+│   ├── __init__.py
+│   ├── test_io.py
+│   ├── conftest.py
+│
+├── README.md
+├── requirements.txt
+├── LICENSE
+├── setup.py
+```
 
-setup.py
-requirements.txt
-README.md
+---
+
+## 📥 Input CSV Example
+
+```
+symbol,units,cost
+AAPL,100,154.23
+AMZN,50,1223.43
+```
+
+---
+
+## 📤 Output CSV Example
+
+```
+symbol,units,cost,latest_price,book_value,market_value,gain_loss,change
+AAPL,100,154.23,170.00,15423,17000,1577,0.10
 ```
 
 ---
 
 ## ⚙️ Installation
-
-Clone the repository:
-
-```
-git clone https://github.com/YOUR_USERNAME/Assignment-7
-cd Assignment-7
-```
 
 Install dependencies:
 
@@ -60,66 +68,26 @@ pip install -r requirements.txt
 Install the package:
 
 ```
-pip install .
+pip install -e .
 ```
-
----
-
-## 🔑 API Setup
-
-1. Go to: https://iexcloud.io
-2. Create an account
-3. Generate your API key
-4. Replace in code:
-
-```python
-api_key = "YOUR_API_KEY"
-```
-
-⚠️ Do not share your API key.
 
 ---
 
 ## ▶️ Usage
 
-Run the program from terminal:
-
 ```
-portfolio_report --source portfolio.csv --target report.csv
-```
-
----
-
-## 📥 Input CSV Format
-
-```
-symbol,units,cost
-AAPL,1000,123.56
-AMZN,20,2001.1
-```
-
----
-
-## 📤 Output CSV Format
-
-```
-symbol,units,cost,latest_price,book_value,market_value,gain_loss,change
+portfolio_report --source portfolio.csv --target report.csv --apikey YOUR_API_KEY
 ```
 
 ---
 
 ## 🧪 Testing
 
-Run tests using:
+Run tests:
 
 ```
-pytest
+pytest -v
 ```
-
-Uses:
-
-* pytest
-* requests-mock
 
 ---
 
@@ -127,16 +95,11 @@ Uses:
 
 * Python 3.x
 * requests
+* pytest
 * requests-mock
-
----
-
-## 👨‍💻 Author
-
-Dennis Zacharia
 
 ---
 
 ## 📄 License
 
-This project is for educational purposes.
+MIT License
