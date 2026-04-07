@@ -36,13 +36,11 @@ def save_portfolio(data, filename):
 
 
 # ---------------------------
-# API FUNCTION
+# API FUNCTION (FIXED)
 # ---------------------------
 def get_market_data(symbols):
-    symbols_str = ",".join(symbols)
-
-    # MUST match test exactly
-    url = f"https://fakeapi.com/prices?symbols={symbols_str}"
+    # EXACT format required
+    url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
 
     response = requests.get(url)
     data = response.json()
@@ -55,7 +53,7 @@ def get_market_data(symbols):
 
 
 # ---------------------------
-# CALCULATE METRICS (REQUIRED)
+# CALCULATE METRICS (FIXED)
 # ---------------------------
 def calculate_metrics(portfolio, prices):
     results = []
@@ -70,16 +68,13 @@ def calculate_metrics(portfolio, prices):
         market_value = units * price
         gain_loss = market_value - book_value
 
-        if book_value != 0:
-            change = gain_loss / book_value
-        else:
-            change = 0
+        change = gain_loss / book_value if book_value != 0 else 0
 
         results.append({
             "symbol": symbol,
-            "book_value": book_value,
-            "market_value": market_value,
-            "gain_loss": gain_loss,
+            "book_value": int(book_value),
+            "market_value": int(market_value),
+            "gain_loss": int(gain_loss),
             "change": change
         })
 
@@ -87,7 +82,7 @@ def calculate_metrics(portfolio, prices):
 
 
 # ---------------------------
-# MAIN
+# MAIN (optional but safe)
 # ---------------------------
 def main():
     import argparse
