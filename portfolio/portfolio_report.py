@@ -39,9 +39,10 @@ def save_portfolio(data, filename):
 # API FUNCTION
 # ---------------------------
 def get_market_data(symbols):
+    # convert list → string
     symbols_str = ",".join(symbols)
 
-    # EXACT URL (must match test)
+    # MUST match test exactly
     url = f"https://fakeapi.com/prices?symbols={symbols_str}"
 
     response = requests.get(url)
@@ -55,15 +56,15 @@ def get_market_data(symbols):
 
 
 # ---------------------------
-# CALCULATIONS (FIXED)
+# CALCULATIONS
 # ---------------------------
 def calculate_portfolio_value(portfolio, market_data):
     total = 0
 
     for stock in portfolio:
         symbol = stock["symbol"]
-        units = int(stock["units"])   # ⚠️ MUST be int
-        price = market_data[symbol]   # ⚠️ direct access
+        units = int(stock["units"])          # must be int
+        price = market_data[symbol]          # direct access
 
         total += units * price
 
@@ -76,7 +77,7 @@ def calculate_profit_loss(portfolio, market_data):
 
     for stock in portfolio:
         symbol = stock["symbol"]
-        units = int(stock["units"])   # ⚠️ MUST be int
+        units = int(stock["units"])          # must be int
         cost = float(stock["cost"])
         price = market_data[symbol]
 
@@ -84,3 +85,30 @@ def calculate_profit_loss(portfolio, market_data):
         total_value += units * price
 
     return total_value - total_cost
+
+
+# ---------------------------
+# MAIN (for CLI / packaging)
+# ---------------------------
+def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Portfolio Report")
+    parser.add_argument("file", help="CSV file path")
+
+    args = parser.parse_args()
+
+    portfolio = read_portfolio(args.file)
+    symbols = [stock["symbol"] for stock in portfolio]
+
+    market_data = get_market_data(symbols)
+
+    total_value = calculate_portfolio_value(portfolio, market_data)
+    profit_loss = calculate_profit_loss(portfolio, market_data)
+
+    print(f"Total Value: {total_value}")
+    print(f"Profit/Loss: {profit_loss}")
+
+
+if __name__ == "__main__":
+    main()
