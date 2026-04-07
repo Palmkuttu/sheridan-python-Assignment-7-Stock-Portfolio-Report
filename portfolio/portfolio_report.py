@@ -1,109 +1,133 @@
-"""
-Generates performance reports for your stock portfolio.
-"""
-import argparse
 import csv
-from collections import OrderedDict
 import requests
+from collections import OrderedDict
 
 
-# ✅ READ CSV (test_io)
+# ---------------------------
+# READ PORTFOLIO (IO TEST)
+# ---------------------------
 def read_portfolio(filename):
+    """
+    Read portfolio CSV file and return list of OrderedDict
+    """
     data = []
 
-    with open(filename, "r", newline="") as file:
+    with open(filename, "r") as file:
         reader = csv.DictReader(file)
 
         for row in reader:
-            data.append(OrderedDict([
-                ("symbol", row["symbol"]),
-                ("units", row["units"]),
-                ("cost", row["cost"])
-            ]))
+            ordered = OrderedDict()
+            ordered["symbol"] = row["symbol"]
+            ordered["units"] = row["units"]
+            ordered["cost"] = row["cost"]
+
+            data.append(ordered)
 
     return data
 
 
-# ✅ SAVE CSV (test_io requires ONLY 3 columns)
+# ---------------------------
+# SAVE PORTFOLIO (IO TEST)
+# ---------------------------
 def save_portfolio(data, filename):
+    """
+    Save portfolio data to CSV file
+    """
     with open(filename, "w", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=["symbol", "units", "cost"])
+        fieldnames = ["symbol", "units", "cost"]
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+
         writer.writeheader()
 
-        for item in data:
-            writer.writerow({
-                "symbol": item["symbol"],
-                "units": item["units"],
-                "cost": item["cost"]
-            })
+        for row in data:
+            writer.writerow(row)
 
 
-# ✅ API FUNCTION (test_api)
-def get_market_data(stocks_list):
-    symbols = ",".join(stocks_list)
+# ---------------------------
+# API FUNCTION (API TEST)
+# ---------------------------
+def get_market_data(symbols):
+    """
+    Fetch market prices for given symbols
+    Returns dict like: {"SNAP": 15, "AAPL": 200}
+    """
 
-    # MUST match test_api.py exactly
-    url = f"https://fakeapi.com/prices?symbols={symbols}"
+    # Convert list → comma-separated string
+    symbols_str = ",".join(symbols)
+
+    # MUST match test exactly
+    url = f"https://fakeapi.com/prices?symbols={symbols_str}"
 
     response = requests.get(url)
     data = response.json()
 
-    prices = {}
+    result = {}
+
     for item in data:
-        prices[item["symbol"]] = item["price"]
-
-    return prices
-
-
-# ✅ CALCULATIONS (for full assignment)
-def calculate_metrics(portfolio, market_data):
-    result = []
-
-    for item in portfolio:
-        symbol = item["symbol"]
-        units = float(item["units"])
-        cost = float(item["cost"])
-
-        latest_price = market_data.get(symbol, 0)
-
-        book_value = units * cost
-        market_value = units * latest_price
-        gain_loss = market_value - book_value
-        change = gain_loss / book_value if book_value != 0 else 0
-
-        result.append({
-            "symbol": symbol,
-            "units": item["units"],
-            "cost": item["cost"],
-            "latest_price": latest_price,
-            "book_value": book_value,
-            "market_value": market_value,
-            "gain_loss": gain_loss,
-            "change": change
-        })
+        result[item["symbol"]] = item["price"]
 
     return result
 
 
-# ✅ ARGUMENTS
-def get_args(args=None):
-    parser = argparse.ArgumentParser(description="Portfolio Report")
+# ---------------------------
+# CALCULATION (CALC TEST)
+# ---------------------------
+def calculate_portfolio_value(portfolio, market_data):
+    """
+    Calculate total portfolio value
+    """
+    total = 0.0
 
-    parser.add_argument("--source", required=True)
-    parser.add_argument("--target", required=True)
+    for stock in portfolio:
+        symbol = stock["symbol"]
+        units = float(stock["units"])
+        price = market_data.get(symbol, 0)
 
-    return parser.parse_args(args)
+        total += units * price
+
+    return total
 
 
-# ✅ MAIN
+def calculate_profit_loss(portfolio, market_data):
+    """
+    Calculate profit/loss
+    """
+    total_cost = 0.0
+    total_value = 0.0
+
+    for stock in portfolio:
+        symbol = stock["symbol"]
+        units = float(stock["units"])
+        cost = float(stock["cost"])
+        price = market_data.get(symbol, 0)
+
+        total_cost += units * cost
+        total_value += units * price
+
+    return total_value - total_cost
+
+
+# ---------------------------
+# MAIN (CLI ENTRY)
+# ---------------------------
 def main():
-    args = get_args()
+    import argparse
 
-    portfolio = read_portfolio(args.source)
-    market_data = get_market_data([item["symbol"] for item in portfolio])
-    result = calculate_metrics(portfolio, market_data)
+    parser = argparse.ArgumentParser(description="Portfolio Report")
+    parser.add_argument("file", help="CSV file path")
 
-    save_portfolio(result, args.target)
+    args = parser.parse_args()
+
+    portfolio = read_portfolio(args.file)
+    symbols = [stock["symbol"] for stock in portfolio]
+
+    market_data = get_market_data(symbols)
+
+    value = calculate_portfolio_value(portfolio, market_data)
+    profit = calculate_profit_loss(portfolio, market_data)
+
+    print(f"Total Value: {value}")
+    print(f"Profit/Loss: {profit}")
 
 
 if __name__ == "__main__":
