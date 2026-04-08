@@ -65,7 +65,6 @@ def calculate_portfolio(data, prices):
     return result
 
 def save_portfolio(data, filename):
-    # Match test expectations (ONLY 3 fields)
     fieldnames = ["symbol", "units", "cost"]
 
     with open(filename, "w", newline="") as file:
@@ -77,7 +76,7 @@ def save_portfolio(data, filename):
                 "symbol": row["symbol"],
                 "units": row["units"],
                 "cost": row["cost"]
-})
+            })
 
 def main():
     parser = argparse.ArgumentParser(description="Stock Portfolio Report Generator")
