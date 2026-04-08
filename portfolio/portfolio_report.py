@@ -62,7 +62,7 @@ def calculate_portfolio(data, prices):
             "market_value": round(market_value, 2),
             "gain_loss": round(gain_loss, 2),
             "change": round(change, 3)
-        })
+})
 
     return result
 
@@ -79,7 +79,7 @@ def save_portfolio(data, filename):
                 "symbol": row["symbol"],
                 "units": row["units"],
                 "cost": row["cost"]
-            })
+})
 
 def main():
     parser = argparse.ArgumentParser(description="Stock Portfolio Report Generator")
