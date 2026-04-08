@@ -33,6 +33,6 @@ def save_portfolio(data, filename):
             writer.writerow(row)
 
 
-# ✅ KEEP THIS EVEN IF NOT USED
+# 🔥 REQUIRED FOR TESTS (DO NOT DELETE)
 def get_market_data(symbols):
     return {}
