@@ -2,10 +2,6 @@ import csv
 import requests
 from collections import OrderedDict
 
-
-# ---------------------------
-# READ PORTFOLIO
-# ---------------------------
 def read_portfolio(filename):
     data = []
 
@@ -21,10 +17,6 @@ def read_portfolio(filename):
 
     return data
 
-
-# ---------------------------
-# SAVE PORTFOLIO
-# ---------------------------
 def save_portfolio(data, filename):
     with open(filename, "w", newline="") as file:
         fieldnames = ["symbol", "units", "cost"]
@@ -33,11 +25,7 @@ def save_portfolio(data, filename):
         writer.writeheader()
         for row in data:
             writer.writerow(row)
-
-
-# ---------------------------
-# API FUNCTION (FIXED)
-# ---------------------------
+            
 def get_market_data(symbols):
     # EXACT format required
     url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
@@ -50,6 +38,9 @@ def get_market_data(symbols):
         result[item["symbol"]] = item["price"]
 
     return result
+
+if __name__ == "__main__":
+    main()
 
 
 # ---------------------------
