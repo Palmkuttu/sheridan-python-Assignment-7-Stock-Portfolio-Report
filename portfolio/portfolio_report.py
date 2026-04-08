@@ -76,7 +76,7 @@ def save_portfolio(data, filename):
                 "symbol": row["symbol"],
                 "units": row["units"],
                 "cost": row["cost"]
-            })
+})
 
 def main():
     parser = argparse.ArgumentParser(description="Stock Portfolio Report Generator")
