@@ -34,17 +34,22 @@ def save_portfolio(data, filename):
             writer.writerow(row)
 
 
-# 🔥 FINAL CORRECT VERSION
 def get_market_data(symbols):
+    # 🔥 MUST MATCH TEST EXACTLY
     url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
 
     response = requests.get(url)
+
+    # handle failure safely
+    if response.status_code != 200:
+        return {}
 
     data = response.json()
 
     result = {}
 
+    # 🔥 CRITICAL: return symbol -> price (NOT dict)
     for item in data:
-        result[item["symbol"]] = item["price"]   # ✅ MUST be EXACT
+        result[item["symbol"]] = item["price"]
 
     return result
