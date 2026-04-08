@@ -1,69 +1,54 @@
+"""
+Generates performance reports for your stock portfolio.
+"""
+import argparse
 import csv
-import requests
 from collections import OrderedDict
+import requests
+
+
+def main():
+    """
+    Entrypoint into program.
+    """
+  
 
 
 def read_portfolio(filename):
     """
-    Read portfolio CSV file and return list of OrderedDict
+    Returns data from a CSV file
     """
-    data = []
-
-    with open(filename, "r") as file:
-        reader = csv.DictReader(file)
-
-        for row in reader:
-            ordered = OrderedDict()
-            ordered["symbol"] = row["symbol"]
-            ordered["units"] = row["units"]
-            ordered["cost"] = row["cost"]
-
-            data.append(ordered)
-
-    return data
+   
 
 
-def save_portfolio(data, filename):
+def get_args(args=None):
     """
-    Save portfolio data to CSV file
+    Parse and return command line argument values
     """
-    fieldnames = [
-        "symbol", "units", "cost", "latest_price",
-        "book_value", "market_value", "gain_loss", "change"
-    ]
-
-    with open(filename, "w", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
-        writer.writeheader()
-
-        for row in data:
-            writer.writerow(row)
+    
 
 
-def get_market_data(symbols):
+def get_market_data(stocks_list):
     """
-    Fetch market data using API (mocked in tests)
-    Returns: dict {symbol: price}
+    Get the latest market data for the given stock symbols
     """
-    url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
+    
 
-    try:
-        response = requests.get(url)
 
-        # ✅ IMPORTANT: must return dict, not None
-        if response.status_code != 200:
-            return {}
+def calculate_metrics(input_file, market_data):
+    """
+    Calculates the various metrics of each of the stocks
+    """
+    
 
-        data = response.json()
 
-        result = {}
+def save_portfolio(output_data, filename):
+    """
+    Saves data to a CSV file
+    """
+    
 
-        # ✅ REQUIRED FORMAT: symbol -> price
-        for item in data:
-            result[item["symbol"]] = item["price"]
 
-        return result
+if __name__ == '__main__':
+    main()
 
-    except Exception:
-        # ✅ Safe fallback for GitHub Actions
-        return {}
