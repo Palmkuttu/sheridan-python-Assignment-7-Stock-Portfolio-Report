@@ -2,6 +2,7 @@ import csv
 import requests
 from collections import OrderedDict
 
+
 def read_portfolio(filename):
     data = []
 
@@ -17,17 +18,22 @@ def read_portfolio(filename):
 
     return data
 
-def save_portfolio(data, filename):
-    with open(filename, "w", newline="") as file:
-        fieldnames = ["symbol", "units", "cost"]
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
 
+def save_portfolio(data, filename):
+    fieldnames = [
+        "symbol", "units", "cost", "latest_price",
+        "book_value", "market_value", "gain_loss", "change"
+    ]
+
+    with open(filename, "w", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
+
         for row in data:
             writer.writerow(row)
-            
+
+
 def get_market_data(symbols):
-    # EXACT format required
     url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
 
     response = requests.get(url)
@@ -47,16 +53,18 @@ def calculate_metrics(portfolio, prices):
         symbol = stock["symbol"]
         units = int(stock["units"])
         cost = float(stock["cost"])
-        price = prices[symbol]
+        price = prices.get(symbol, 0)
 
         book_value = units * cost
         market_value = units * price
         gain_loss = market_value - book_value
-
         change = gain_loss / book_value if book_value != 0 else 0
 
         results.append({
             "symbol": symbol,
+            "units": units,
+            "cost": cost,
+            "latest_price": price,
             "book_value": int(book_value),
             "market_value": int(market_value),
             "gain_loss": int(gain_loss),
@@ -65,23 +73,28 @@ def calculate_metrics(portfolio, prices):
 
     return results
 
+
 def main():
     import argparse
 
-    parser = argparse.ArgumentParser(description="Portfolio Report")
-    parser.add_argument("file", help="CSV file path")
+    parser = argparse.ArgumentParser(description="Stock Portfolio Report")
+
+    parser.add_argument("--source", required=True, help="Input CSV file")
+    parser.add_argument("--target", required=True, help="Output CSV file")
 
     args = parser.parse_args()
 
-    portfolio = read_portfolio(args.file)
+    portfolio = read_portfolio(args.source)
     symbols = [stock["symbol"] for stock in portfolio]
 
     prices = get_market_data(symbols)
-    metrics = calculate_metrics(portfolio, prices)
+    results = calculate_metrics(portfolio, prices)
 
-    for item in metrics:
-        print(item)
+    save_portfolio(results, args.target)
+
+    print(f"Report saved to {args.target}")
 
 
 if __name__ == "__main__":
     main()
+
