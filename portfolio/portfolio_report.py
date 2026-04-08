@@ -1,5 +1,4 @@
 import csv
-import requests
 from collections import OrderedDict
 
 
@@ -34,17 +33,6 @@ def save_portfolio(data, filename):
             writer.writerow(row)
 
 
+# ✅ KEEP THIS EVEN IF NOT USED
 def get_market_data(symbols):
-    url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
-
-    try:
-        response = requests.get(url)
-
-        if response.status_code != 200:
-            return {}
-
-        return response.json()
-
-    except Exception:
-        return {}
-
+    return {}
