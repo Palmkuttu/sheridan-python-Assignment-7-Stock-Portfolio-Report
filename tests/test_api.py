@@ -4,7 +4,6 @@ Tests API using requests-mock
 
 from portfolio import portfolio_report
 
-
 def test_get_market_data(requests_mock):
     # Mock API response
     mock_response = [
