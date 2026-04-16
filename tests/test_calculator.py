@@ -1,5 +1,6 @@
 from portfolio.portfolio_report import calculate
 
+
 def test_calculate_basic():
     data = [{"symbol": "AAPL", "units": 10, "cost": 100}]
     prices = {"AAPL": 150}
@@ -26,6 +27,7 @@ def test_calculate_loss():
     assert stock["gain_loss"] == -1000
     assert stock["change"] == -0.5
 
+
 def test_missing_symbol():
     data = [{"symbol": "AAPL", "units": 10, "cost": 100}]
     prices = {}
@@ -33,6 +35,7 @@ def test_missing_symbol():
     result = calculate(data, prices)
 
     assert result == []
+
 
 def test_multiple_stocks():
     data = [
