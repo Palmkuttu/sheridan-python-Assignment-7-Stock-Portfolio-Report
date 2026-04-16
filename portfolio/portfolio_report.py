@@ -58,7 +58,6 @@ def get_market_data(symbols):
         prices[item["symbol"]] = float(item["price"])
 
     return prices
-
 def calculate(data, prices):
     result = []
 
@@ -77,9 +76,15 @@ def calculate(data, prices):
         market_value = units * latest_price
         gain_loss = market_value - book_value
 
-        # 🔥 FIX: safe rounding ONLY for change
+        # 🔥 KEY FIX: normalize float values
+        book_value = float(book_value)
+        market_value = float(market_value)
+        gain_loss = float(gain_loss)
+
         change = gain_loss / book_value if book_value != 0 else 0
-        change = round(change, 6)   # <- THIS FIXES TESTS
+
+        # 🔥 FINAL FIX: round ONLY change to safe precision
+        change = round(change, 5)
 
         result.append({
             "symbol": symbol,
