@@ -5,20 +5,18 @@ import argparse
 import csv
 import requests
 
-
 def main():
     args = get_args()
 
     portfolio = read_portfolio(args.source)
     symbols = [row["symbol"] for row in portfolio]
 
-    market_data = get_market_data(symbols)
-    result = calculate(portfolio, market_data)
+    prices = get_market_data(symbols)
+    result = calculate(portfolio, prices)
 
     save_portfolio(result, args.target)
 
     print("Report generated successfully!")
-
 
 def read_portfolio(filename):
     data = []
@@ -35,7 +33,6 @@ def read_portfolio(filename):
 
     return data
 
-
 def get_args(args=None):
     parser = argparse.ArgumentParser()
 
@@ -44,9 +41,8 @@ def get_args(args=None):
 
     return parser.parse_args(args)
 
-
-def get_market_data(stocks_list):
-    url = "https://fakeapi.com/prices?symbols=" + ",".join(stocks_list)
+def get_market_data(symbols):
+    url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
 
     response = requests.get(url)
 
@@ -61,21 +57,19 @@ def get_market_data(stocks_list):
 
     return prices
 
-
-# ✅ THIS NAME MUST MATCH TEST
 def calculate(data, prices):
     result = []
 
     for row in data:
         symbol = row["symbol"]
 
-        # skip missing symbols
+        # skip missing symbol
         if symbol not in prices:
             continue
 
         units = float(row["units"])
         cost = float(row["cost"])
-        latest_price = prices[symbol]
+        latest_price = float(prices[symbol])
 
         book_value = units * cost
         market_value = units * latest_price
@@ -96,8 +90,7 @@ def calculate(data, prices):
 
     return result
 
-
-def save_portfolio(output_data, filename):
+def save_portfolio(data, filename):
     fieldnames = [
         "symbol", "units", "cost",
         "latest_price", "book_value",
@@ -107,8 +100,8 @@ def save_portfolio(output_data, filename):
     with open(filename, "w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
-        writer.writerows(output_data)
+        writer.writerows(data)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
