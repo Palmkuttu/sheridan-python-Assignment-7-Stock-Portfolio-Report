@@ -1,10 +1,9 @@
-from portfolio.calculator import calculate
+from portfolio.portfolio_report import calculate
 
 
-# 🔹 TEST: basic calculation
+# 🔹 TEST 1: basic calculation
 def test_calculate_basic():
-
-    portfolio = [
+    data = [
         {"symbol": "AAPL", "units": 10, "cost": 100}
     ]
 
@@ -12,7 +11,7 @@ def test_calculate_basic():
         "AAPL": 150
     }
 
-    result = calculate(portfolio, prices)
+    result = calculate(data, prices)
 
     assert len(result) == 1
 
@@ -24,10 +23,9 @@ def test_calculate_basic():
     assert stock["change"] == 0.5
 
 
-# 🔹 TEST: loss case
+# 🔹 TEST 2: loss case
 def test_calculate_loss():
-
-    portfolio = [
+    data = [
         {"symbol": "AAPL", "units": 10, "cost": 200}
     ]
 
@@ -35,7 +33,7 @@ def test_calculate_loss():
         "AAPL": 100
     }
 
-    result = calculate(portfolio, prices)
+    result = calculate(data, prices)
 
     stock = result[0]
 
@@ -43,24 +41,22 @@ def test_calculate_loss():
     assert stock["change"] == -0.5
 
 
-# 🔹 TEST: missing symbol (should skip)
+# 🔹 TEST 3: missing symbol → should skip
 def test_missing_symbol():
-
-    portfolio = [
+    data = [
         {"symbol": "AAPL", "units": 10, "cost": 100}
     ]
 
-    prices = {}  # API returned nothing
+    prices = {}  # no data returned
 
-    result = calculate(portfolio, prices)
+    result = calculate(data, prices)
 
     assert result == []
 
 
-# 🔹 TEST: multiple stocks
+# 🔹 TEST 4: multiple stocks
 def test_multiple_stocks():
-
-    portfolio = [
+    data = [
         {"symbol": "AAPL", "units": 10, "cost": 100},
         {"symbol": "AMZN", "units": 5, "cost": 200}
     ]
@@ -70,7 +66,7 @@ def test_multiple_stocks():
         "AMZN": 300
     }
 
-    result = calculate(portfolio, prices)
+    result = calculate(data, prices)
 
     assert len(result) == 2
     assert result[0]["market_value"] == 1500
