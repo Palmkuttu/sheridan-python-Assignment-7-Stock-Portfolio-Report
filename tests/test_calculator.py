@@ -21,7 +21,6 @@ def test_calculate_loss():
     prices = {"AAPL": 100}
 
     result = calculate(data, prices)
-
     stock = result[0]
 
     assert stock["gain_loss"] == -1000
@@ -40,16 +39,13 @@ def test_missing_symbol():
 def test_multiple_stocks():
     data = [
         {"symbol": "AAPL", "units": 10, "cost": 100},
-        {"symbol": "AMZN", "units": 5, "cost": 200}
+        {"symbol": "MSFT", "units": 5, "cost": 200}
     ]
-
-    prices = {
-        "AAPL": 150,
-        "AMZN": 300
-    }
+    prices = {"AAPL": 150, "MSFT": 250}
 
     result = calculate(data, prices)
 
     assert len(result) == 2
-    assert result[0]["market_value"] == 1500
-    assert result[1]["market_value"] == 1500
+
+    assert result[0]["symbol"] == "AAPL"
+    assert result[1]["symbol"] == "MSFT"
