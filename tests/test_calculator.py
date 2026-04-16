@@ -14,6 +14,7 @@ def test_calculate_basic():
     assert stock["gain_loss"] == 500
     assert stock["change"] == 0.5
 
+
 def test_calculate_loss():
     data = [{"symbol": "AAPL", "units": 10, "cost": 200}]
     prices = {"AAPL": 100}
