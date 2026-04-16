@@ -12,12 +12,10 @@ def read_portfolio(filename):
             data.append({
                 "symbol": row["symbol"],
                 "units": int(row["units"]),
-                "cost": int(row["cost"])
+                "cost": float(row["cost"])   # ✅ MUST BE FLOAT
             })
     return data
 
-
-# ✅ API (WORKING)
 def get_market_data(symbols):
     url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
     response = requests.get(url)
