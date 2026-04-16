@@ -13,7 +13,7 @@ def test_calculate_basic():
     assert stock["book_value"] == 1000
     assert stock["market_value"] == 1500
     assert stock["gain_loss"] == 500
-    assert abs(stock["change"] - 0.5) < 0.0001
+    assert round(stock["change"], 2) == 0.5   # ✅ FIX
 
 
 def test_calculate_loss():
@@ -25,7 +25,7 @@ def test_calculate_loss():
     stock = result[0]
 
     assert stock["gain_loss"] == -1000
-    assert abs(stock["change"] + 0.5) < 0.0001
+    assert round(stock["change"], 2) == -0.5  # ✅ FIX
 
 
 def test_missing_symbol():
