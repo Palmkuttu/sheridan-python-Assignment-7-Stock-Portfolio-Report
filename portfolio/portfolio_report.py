@@ -1,7 +1,9 @@
 import argparse
 import csv
+import requests
 
 
+# ✅ READ CSV
 def read_portfolio(filename):
     data = []
     with open(filename, "r") as file:
@@ -9,15 +11,27 @@ def read_portfolio(filename):
         for row in reader:
             data.append({
                 "symbol": row["symbol"],
-                "units": float(row["units"]),
-                "cost": float(row["cost"])
+                "units": int(row["units"]),
+                "cost": int(row["cost"])
             })
     return data
 
 
+# ✅ GET MARKET DATA (API REQUIRED FOR TEST)
 def get_market_data(symbols):
-    return {symbol: 100.0 for symbol in symbols}
+    url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
+    response = requests.get(url)
 
+    data = response.json()
+
+    prices = {}
+    for item in data:
+        prices[item["symbol"]] = item["price"]
+
+    return prices
+
+
+# ✅ CALCULATE (already correct)
 def calculate(portfolio, prices):
     result = []
 
@@ -26,7 +40,6 @@ def calculate(portfolio, prices):
         units = row["units"]
         cost = row["cost"]
 
-        # skip if symbol not in prices
         if symbol not in prices:
             continue
 
@@ -36,10 +49,7 @@ def calculate(portfolio, prices):
         market_value = units * market_price
         gain_loss = market_value - book_value
 
-        if book_value != 0:
-            change = gain_loss / book_value
-        else:
-            change = 0
+        change = gain_loss / book_value if book_value != 0 else 0
 
         result.append({
             "symbol": symbol,
@@ -51,24 +61,32 @@ def calculate(portfolio, prices):
         })
 
     return result
-    return result
 
 
+# ✅ SAVE CSV
 def save_portfolio(data, filename):
     with open(filename, "w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=[
-            "symbol", "units", "cost",
-            "market_price", "market_value", "gain"
+            "symbol",
+            "units",
+            "book_value",
+            "market_value",
+            "gain_loss",
+            "change"
         ])
         writer.writeheader()
         writer.writerows(data)
 
+
+# ✅ ARGUMENTS
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", required=True)
     parser.add_argument("--target", required=True)
     return parser.parse_args()
 
+
+# ✅ MAIN
 def main():
     args = get_args()
     portfolio = read_portfolio(args.source)
@@ -80,4 +98,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
