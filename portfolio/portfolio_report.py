@@ -17,8 +17,8 @@ def read_portfolio(filename):
     return data
 
 def get_market_data(symbols):
-    url = "https://fakeapi.com/prices"
-    
+    url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
+
     response = requests.get(url)
 
     data = response.json()
