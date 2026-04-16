@@ -16,11 +16,13 @@ def read_portfolio(filename):
             })
     return data
 
-
-# ✅ API (STRICT URL MATCH)
 def get_market_data(symbols):
     url = "https://fakeapi.com/prices"
-    response = requests.get(url)
+    
+    # ✅ ADD THIS LINE (CRITICAL FIX)
+    params = {"symbols": ",".join(symbols)}
+    
+    response = requests.get(url, params=params)
 
     data = response.json()
 
@@ -30,8 +32,6 @@ def get_market_data(symbols):
 
     return prices
 
-
-# ✅ CALCULATE
 def calculate(portfolio, prices):
     result = []
 
