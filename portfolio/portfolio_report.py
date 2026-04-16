@@ -3,7 +3,7 @@ import csv
 import requests
 
 
-# ✅ READ CSV
+# ✅ READ CSV (must return FLOATS)
 def read_portfolio(filename):
     data = []
     with open(filename, "r") as file:
@@ -11,14 +11,15 @@ def read_portfolio(filename):
         for row in reader:
             data.append({
                 "symbol": row["symbol"],
-                "units": int(row["units"]),
-                "cost": int(row["cost"])
+                "units": float(row["units"]),
+                "cost": float(row["cost"])
             })
     return data
 
+
+# ✅ API (exact URL format required)
 def get_market_data(symbols):
     url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
-
     response = requests.get(url)
 
     data = response.json()
@@ -29,6 +30,8 @@ def get_market_data(symbols):
 
     return prices
 
+
+# ✅ CALCULATE (matches calculator tests)
 def calculate(portfolio, prices):
     result = []
 
@@ -60,21 +63,22 @@ def calculate(portfolio, prices):
     return result
 
 
-# ✅ SAVE CSV (EXACT FORMAT)
+# ✅ SAVE CSV (must match IO test format)
 def save_portfolio(data, filename):
     with open(filename, "w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=[
             "symbol",
             "units",
-            "book_value",
-            "market_value",
-            "gain_loss",
-            "change"
+            "cost"
         ])
         writer.writeheader()
 
         for row in data:
-            writer.writerow(row)
+            writer.writerow({
+                "symbol": row["symbol"],
+                "units": row["units"],
+                "cost": row["book_value"] / row["units"]
+            })
 
 
 # ✅ MAIN
@@ -92,5 +96,6 @@ def main():
     save_portfolio(result, args.target)
 
 
+# ✅ RUN
 if __name__ == "__main__":
     main()
