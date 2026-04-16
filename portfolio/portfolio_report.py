@@ -1,10 +1,13 @@
 """
 Generates performance reports for your stock portfolio.
 """
+
 import argparse
 import csv
 import requests
 
+
+# ✅ MAIN
 def main():
     args = get_args()
 
@@ -18,6 +21,8 @@ def main():
 
     print("Report generated successfully!")
 
+
+# ✅ READ CSV
 def read_portfolio(filename):
     data = []
 
@@ -58,13 +63,16 @@ def get_market_data(symbols):
         prices[item["symbol"]] = float(item["price"])
 
     return prices
+
+
+# ✅ CALCULATE (🔥 NO ROUNDING — REQUIRED)
 def calculate(data, prices):
     result = []
 
     for row in data:
         symbol = row["symbol"]
 
-        # skip missing symbol
+        # skip missing symbols
         if symbol not in prices:
             continue
 
@@ -76,15 +84,7 @@ def calculate(data, prices):
         market_value = units * latest_price
         gain_loss = market_value - book_value
 
-        # 🔥 KEY FIX: normalize float values
-        book_value = float(book_value)
-        market_value = float(market_value)
-        gain_loss = float(gain_loss)
-
         change = gain_loss / book_value if book_value != 0 else 0
-
-        # 🔥 FINAL FIX: round ONLY change to safe precision
-        change = round(change, 5)
 
         result.append({
             "symbol": symbol,
@@ -99,6 +99,8 @@ def calculate(data, prices):
 
     return result
 
+
+# ✅ SAVE CSV
 def save_portfolio(data, filename):
     fieldnames = [
         "symbol", "units", "cost",
@@ -112,5 +114,6 @@ def save_portfolio(data, filename):
         writer.writerows(data)
 
 
+# ✅ RUN
 if __name__ == "__main__":
     main()
