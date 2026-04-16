@@ -19,10 +19,7 @@ def read_portfolio(filename):
 def get_market_data(symbols):
     url = "https://fakeapi.com/prices"
     
-    # ✅ ADD THIS LINE (CRITICAL FIX)
-    params = {"symbols": ",".join(symbols)}
-    
-    response = requests.get(url, params=params)
+    response = requests.get(url)
 
     data = response.json()
 
