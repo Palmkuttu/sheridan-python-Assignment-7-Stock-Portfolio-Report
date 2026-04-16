@@ -3,7 +3,7 @@ import csv
 import requests
 
 
-# ✅ READ CSV (STRICT)
+# ✅ READ (RETURN STRINGS)
 def read_portfolio(filename):
     data = []
     with open(filename, "r") as file:
@@ -11,27 +11,28 @@ def read_portfolio(filename):
         for row in reader:
             data.append({
                 "symbol": row["symbol"],
-                "units": int(row["units"]),
-                "cost": float(row["cost"])   # ✅ MUST BE FLOAT
+                "units": row["units"],   # STRING
+                "cost": row["cost"]      # STRING
             })
     return data
 
+
+# ✅ API
 def get_market_data(symbols):
     url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
     response = requests.get(url)
     data = response.json()
-
     return {item["symbol"]: item["price"] for item in data}
 
 
-# ✅ CALCULATE (DO NOT TOUCH)
+# ✅ CALCULATE (CONVERT HERE)
 def calculate(portfolio, prices):
     result = []
 
     for row in portfolio:
         symbol = row["symbol"]
-        units = row["units"]
-        cost = row["cost"]
+        units = int(row["units"])      # convert here
+        cost = float(row["cost"])      # convert here
 
         if symbol not in prices:
             continue
@@ -46,7 +47,7 @@ def calculate(portfolio, prices):
         result.append({
             "symbol": symbol,
             "units": units,
-            "cost": cost,  # REQUIRED for save test
+            "cost": cost,
             "book_value": book_value,
             "market_value": market_value,
             "gain_loss": gain_loss,
@@ -56,7 +57,7 @@ def calculate(portfolio, prices):
     return result
 
 
-# ✅ SAVE CSV (STRICT FORMAT — THIS WAS YOUR BUG)
+# ✅ SAVE (NO CONVERSION)
 def save_portfolio(data, filename):
     with open(filename, "w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=["symbol", "units", "cost"])
@@ -65,8 +66,8 @@ def save_portfolio(data, filename):
         for row in data:
             writer.writerow({
                 "symbol": row["symbol"],
-                "units": int(row["units"]),
-                "cost": int(row["cost"])
+                "units": row["units"],
+                "cost": row["cost"]
             })
 
 
