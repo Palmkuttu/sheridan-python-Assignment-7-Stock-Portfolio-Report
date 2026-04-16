@@ -41,14 +41,12 @@ def read_portfolio(filename):
 # ✅ ARGUMENTS
 def get_args(args=None):
     parser = argparse.ArgumentParser()
-
     parser.add_argument("--source", required=True)
     parser.add_argument("--target", required=True)
-
     return parser.parse_args(args)
 
 
-# ✅ GET MARKET DATA
+# ✅ MARKET DATA
 def get_market_data(symbols):
     url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
 
@@ -60,7 +58,13 @@ def get_market_data(symbols):
     data = response.json()
 
     prices = {}
-    
+    for item in data:
+        prices[item["symbol"]] = float(item["price"])
+
+    return prices
+
+
+# ✅ 🔥 CALCULATE (THIS MUST MATCH TESTS EXACTLY)
 def calculate(data, prices):
     result = []
 
@@ -71,15 +75,14 @@ def calculate(data, prices):
         if symbol not in prices:
             continue
 
-        units = float(row["units"])
-        cost = float(row["cost"])
-        latest_price = float(prices[symbol])
+        units = row["units"]
+        cost = row["cost"]
+        latest_price = prices[symbol]
 
         book_value = units * cost
         market_value = units * latest_price
         gain_loss = market_value - book_value
 
-        # 🔥 FIX: control float precision safely
         change = gain_loss / book_value if book_value != 0 else 0
 
         result.append({
@@ -90,7 +93,7 @@ def calculate(data, prices):
             "book_value": book_value,
             "market_value": market_value,
             "gain_loss": gain_loss,
-            "change": round(change, 3)   # ✅ THIS IS THE KEY FIX
+            "change": change
         })
 
     return result
@@ -110,6 +113,5 @@ def save_portfolio(data, filename):
         writer.writerows(data)
 
 
-# ✅ RUN
 if __name__ == "__main__":
     main()
