@@ -3,7 +3,7 @@ import csv
 import requests
 
 
-# ✅ READ (RETURN STRINGS)
+# ✅ READ (KEEP STRINGS)
 def read_portfolio(filename):
     data = []
     with open(filename, "r") as file:
@@ -11,36 +11,38 @@ def read_portfolio(filename):
         for row in reader:
             data.append({
                 "symbol": row["symbol"],
-                "units": row["units"],   # STRING
-                "cost": row["cost"]      # STRING
+                "units": row["units"],
+                "cost": row["cost"]
             })
     return data
 
 
-# ✅ API
+# ✅ API (RETURN LIST)
 def get_market_data(symbols):
     url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
     response = requests.get(url)
-    data = response.json()
-    return {item["symbol"]: item["price"] for item in data}
+    return response.json()   # IMPORTANT
 
 
-# ✅ CALCULATE (CONVERT HERE)
+# ✅ CALCULATE
 def calculate(portfolio, prices):
     result = []
 
+    # convert API list → dict for lookup
+    price_map = {item["symbol"]: item["price"] for item in prices}
+
     for row in portfolio:
         symbol = row["symbol"]
-        units = int(row["units"])      # convert here
-        cost = float(row["cost"])      # convert here
+        units = int(row["units"])
+        cost = float(row["cost"])
 
-        if symbol not in prices:
+        if symbol not in price_map:
             continue
 
-        market_price = prices[symbol]
+        latest_price = price_map[symbol]
 
         book_value = units * cost
-        market_value = units * market_price
+        market_value = units * latest_price
         gain_loss = market_value - book_value
         change = gain_loss / book_value if book_value != 0 else 0
 
@@ -48,6 +50,7 @@ def calculate(portfolio, prices):
             "symbol": symbol,
             "units": units,
             "cost": cost,
+            "latest_price": latest_price,
             "book_value": book_value,
             "market_value": market_value,
             "gain_loss": gain_loss,
@@ -57,18 +60,20 @@ def calculate(portfolio, prices):
     return result
 
 
-# ✅ SAVE (NO CONVERSION)
+# ✅ SAVE (ALL COLUMNS)
 def save_portfolio(data, filename):
     with open(filename, "w", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=["symbol", "units", "cost"])
+        fieldnames = [
+            "symbol", "units", "cost",
+            "latest_price", "book_value",
+            "market_value", "gain_loss", "change"
+        ]
+
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
 
         for row in data:
-            writer.writerow({
-                "symbol": row["symbol"],
-                "units": row["units"],
-                "cost": row["cost"]
-            })
+            writer.writerow(row)
 
 
 # ✅ MAIN
@@ -80,9 +85,10 @@ def main():
 
     portfolio = read_portfolio(args.source)
     symbols = [row["symbol"] for row in portfolio]
-    prices = get_market_data(symbols)
 
+    prices = get_market_data(symbols)
     result = calculate(portfolio, prices)
+
     save_portfolio(result, args.target)
 
 
