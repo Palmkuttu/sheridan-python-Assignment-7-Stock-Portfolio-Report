@@ -2,14 +2,13 @@
 
 ## Description
 
-This program reads a CSV file containing stock portfolio data and generates a performance report.
+This project generates a performance report for a stock portfolio using data from a CSV file and live market prices from an API.
 
-It calculates:
+The program calculates:
 
-* Latest stock price
 * Book value
 * Market value
-* Gain or loss
+* Gain/Loss
 * Percentage change
 
 ---
@@ -19,8 +18,8 @@ It calculates:
 * Reads portfolio data from a CSV file
 * Fetches latest stock prices using an API
 * Calculates portfolio performance
-* Generates a new CSV report
-* Includes unit tests for file I/O and API
+* Saves results to a CSV file
+* Includes automated tests using pytest
 
 ---
 
@@ -29,21 +28,15 @@ It calculates:
 ```
 project/
 │
-├── portfolio/
-│   ├── __init__.py
-│   └── portfolio_report.py
-│
-├── tests/
-│   ├── __init__.py
-│   ├── test_io.py
-│   ├── test_api.py
-│   └── conftest.py
-│
-├── README.md
-├── requirements.txt
+├── portfolio_report.py
 ├── setup.py
-├── LICENSE
-├── .gitignore
+├── requirements.txt
+├── README.md
+│
+└── tests/
+    ├── __init__.py
+    ├── conftest.py
+    └── test_io.py
 ```
 
 ---
@@ -52,35 +45,34 @@ project/
 
 ```
 symbol,units,cost
-AAPL,100,154.23
-AMZN,50,1223.43
+AAPL,100,120.50
+AMZN,10,2000.00
 ```
 
 ---
 
 ## Output CSV
 
-The generated report includes:
+The generated report file will contain:
 
-* symbol
-* units
-* cost
-* latest_price
-* book_value
-* market_value
-* gain_loss
-* change
+```
+symbol,units,cost
+AAPL,100,120.50
+AMZN,10,2000.00
+```
 
 ---
 
 ## Requirements
 
-* Python 3
+* Python 3.x
 * requests
+* requests-mock
+* pytest
 
-Install dependencies:
+Install dependencies using:
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
@@ -88,10 +80,10 @@ pip install -r requirements.txt
 
 ## How to Run
 
-After installing the package:
+Run the program using:
 
-```
-portfolio_report --source input.csv --target output.csv
+```bash
+portfolio_report --source portfolio.csv --target report.csv
 ```
 
 ---
@@ -100,27 +92,37 @@ portfolio_report --source input.csv --target output.csv
 
 Run tests using:
 
-```
+```bash
 pytest -v
 ```
 
-Tests included:
+This will test:
 
-* File read/write operations (`test_io.py`)
-* API requests using mock (`test_api.py`)
+* Reading CSV files
+* Writing CSV files
 
 ---
 
 ## Packaging
 
-Install the project locally:
+The project includes a `setup.py` file which allows installation using pip:
 
-```
+```bash
 pip install .
+```
+
+After installation, you can run the command:
+
+```bash
+portfolio_report --source portfolio.csv --target report.csv
 ```
 
 ---
 
-## License
+## Notes
 
-MIT License
+* API requests are mocked during testing using `requests-mock`
+* Only file input/output is tested directly as per assignment requirements
+* The program is designed to be modular and reusable
+
+---
