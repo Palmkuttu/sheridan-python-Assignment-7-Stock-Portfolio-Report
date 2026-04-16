@@ -63,18 +63,15 @@ def calculate(portfolio, prices):
 # ✅ SAVE (ALL COLUMNS)
 def save_portfolio(data, filename):
     with open(filename, "w", newline="") as file:
-        fieldnames = [
-            "symbol", "units", "cost",
-            "latest_price", "book_value",
-            "market_value", "gain_loss", "change"
-        ]
-
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer = csv.DictWriter(file, fieldnames=["symbol", "units", "cost"])
         writer.writeheader()
 
         for row in data:
-            writer.writerow(row)
-
+            writer.writerow({
+                "symbol": row["symbol"],
+                "units": row["units"],
+                "cost": row["cost"]
+            })
 
 # ✅ MAIN
 def main():
