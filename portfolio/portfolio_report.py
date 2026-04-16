@@ -3,7 +3,7 @@ import csv
 import requests
 
 
-# ✅ READ CSV
+# ✅ READ CSV (must return INT, not float)
 def read_portfolio(filename):
     data = []
     with open(filename, "r") as file:
@@ -17,10 +17,13 @@ def read_portfolio(filename):
     return data
 
 
-# ✅ GET MARKET DATA (API REQUIRED FOR TEST)
+# ✅ API FUNCTION (this is what test_api expects)
 def get_market_data(symbols):
     url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
     response = requests.get(url)
+
+    if response.status_code != 200:
+        return {}
 
     data = response.json()
 
@@ -31,7 +34,7 @@ def get_market_data(symbols):
     return prices
 
 
-# ✅ CALCULATE (already correct)
+# ✅ CALCULATE (already correct for tests)
 def calculate(portfolio, prices):
     result = []
 
@@ -63,7 +66,7 @@ def calculate(portfolio, prices):
     return result
 
 
-# ✅ SAVE CSV
+# ✅ SAVE CSV (must match EXACT headers)
 def save_portfolio(data, filename):
     with open(filename, "w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=[
