@@ -2,6 +2,8 @@ import csv
 import requests
 import argparse
 
+
+# ✅ READ CSV
 def read_portfolio(filename):
     data = []
 
@@ -17,6 +19,8 @@ def read_portfolio(filename):
 
     return data
 
+
+# ✅ GET MARKET DATA
 def get_market_data(symbols):
     url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
 
@@ -33,25 +37,26 @@ def get_market_data(symbols):
 
     return prices
 
+
+# ✅ CALCULATE (NO ROUNDING — IMPORTANT)
 def calculate(data, prices):
     result = []
 
     for row in data:
         symbol = row["symbol"]
 
-        # ✅ skip missing symbols (REQUIRED for test)
+        # skip missing symbol
         if symbol not in prices:
             continue
 
-        units = row["units"]
-        cost = row["cost"]
+        units = float(row["units"])
+        cost = float(row["cost"])
         latest_price = prices[symbol]
 
         book_value = units * cost
         market_value = units * latest_price
         gain_loss = market_value - book_value
 
-        # ✅ avoid division error
         change = gain_loss / book_value if book_value != 0 else 0
 
         result.append({
@@ -67,6 +72,8 @@ def calculate(data, prices):
 
     return result
 
+
+# ✅ WRITE CSV
 def write_report(filename, data):
     fieldnames = [
         "symbol", "units", "cost", "latest_price",
@@ -78,6 +85,8 @@ def write_report(filename, data):
         writer.writeheader()
         writer.writerows(data)
 
+
+# ✅ MAIN
 def main():
     parser = argparse.ArgumentParser(description="Stock Portfolio Report Generator")
     parser.add_argument("--source", required=True)
@@ -94,7 +103,6 @@ def main():
     write_report(args.target, report)
 
     print("Report generated successfully!")
-
 
 if __name__ == "__main__":
     main()
