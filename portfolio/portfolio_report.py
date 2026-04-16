@@ -64,15 +64,12 @@ def get_market_data(symbols):
 
     return prices
 
-
-# ✅ CALCULATE (🔥 NO ROUNDING — REQUIRED)
 def calculate(data, prices):
     result = []
 
     for row in data:
         symbol = row["symbol"]
 
-        # skip missing symbols
         if symbol not in prices:
             continue
 
@@ -83,7 +80,6 @@ def calculate(data, prices):
         book_value = units * cost
         market_value = units * latest_price
         gain_loss = market_value - book_value
-
         change = gain_loss / book_value if book_value != 0 else 0
 
         result.append({
@@ -98,7 +94,6 @@ def calculate(data, prices):
         })
 
     return result
-
 
 # ✅ SAVE CSV
 def save_portfolio(data, filename):
