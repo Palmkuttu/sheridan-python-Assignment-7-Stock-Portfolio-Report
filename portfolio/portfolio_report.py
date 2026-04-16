@@ -1,8 +1,9 @@
 import csv
 import requests
 import argparse
-from collections import OrderedDict
 
+
+# ✅ READ CSV
 def read_portfolio(filename):
     data = []
 
@@ -10,16 +11,17 @@ def read_portfolio(filename):
         reader = csv.DictReader(file)
 
         for row in reader:
-            ordered = OrderedDict()
-            ordered["symbol"] = row["symbol"]
-            ordered["units"] = row["units"]
-            ordered["cost"] = row["cost"]
-            data.append(ordered)
+            data.append({
+                "symbol": row["symbol"],
+                "units": float(row["units"]),
+                "cost": float(row["cost"])
+            })
 
     return data
 
+
+# ✅ GET MARKET DATA
 def get_market_data(symbols):
-    # FORCE ORDER EXACTLY AS GIVEN
     url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
 
     response = requests.get(url)
@@ -35,15 +37,21 @@ def get_market_data(symbols):
 
     return prices
 
-def calculate_portfolio(data, prices):
+
+# ✅ CALCULATE (FIXED)
+def calculate(data, prices):
     result = []
 
     for row in data:
         symbol = row["symbol"]
-        units = float(row["units"])
-        cost = float(row["cost"])
 
-        latest_price = prices.get(symbol, 0)
+        # 🔥 REQUIRED: skip missing symbol
+        if symbol not in prices:
+            continue
+
+        units = row["units"]
+        cost = row["cost"]
+        latest_price = prices[symbol]
 
         book_value = units * cost
         market_value = units * latest_price
@@ -53,47 +61,49 @@ def calculate_portfolio(data, prices):
 
         result.append({
             "symbol": symbol,
-            "units": row["units"],
-            "cost": row["cost"],
+            "units": units,
+            "cost": cost,
             "latest_price": round(latest_price, 2),
             "book_value": round(book_value, 2),
             "market_value": round(market_value, 2),
             "gain_loss": round(gain_loss, 2),
             "change": round(change, 3)
-})
+        })
 
     return result
 
-def save_portfolio(data, filename):
-    fieldnames = ["symbol", "units", "cost"]
+
+# ✅ WRITE OUTPUT CSV
+def write_report(filename, data):
+    fieldnames = [
+        "symbol", "units", "cost", "latest_price",
+        "book_value", "market_value", "gain_loss", "change"
+    ]
 
     with open(filename, "w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
+        writer.writerows(data)
 
-        for row in data:
-            writer.writerow({
-                "symbol": row["symbol"],
-                "units": row["units"],
-                "cost": row["cost"]
-})
 
+# ✅ MAIN FUNCTION (CLI)
 def main():
     parser = argparse.ArgumentParser(description="Stock Portfolio Report Generator")
-    parser.add_argument("--source", required=True, help="Input CSV file")
-    parser.add_argument("--target", required=True, help="Output CSV file")
+    parser.add_argument("--source", required=True)
+    parser.add_argument("--target", required=True)
 
     args = parser.parse_args()
 
-    data = read_portfolio(args.source)
-    symbols = [row["symbol"] for row in data]
+    portfolio = read_portfolio(args.source)
+    symbols = [row["symbol"] for row in portfolio]
 
     prices = get_market_data(symbols)
-    result = calculate_portfolio(data, prices)
+    report = calculate(portfolio, prices)
 
-    save_portfolio(result, args.target)
+    write_report(args.target, report)
 
     print("Report generated successfully!")
+
 
 if __name__ == "__main__":
     main()
