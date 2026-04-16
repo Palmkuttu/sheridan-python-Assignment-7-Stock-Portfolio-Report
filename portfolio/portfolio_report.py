@@ -5,6 +5,8 @@ import argparse
 import csv
 import requests
 
+
+# ✅ MAIN
 def main():
     args = get_args()
 
@@ -18,6 +20,8 @@ def main():
 
     print("Report generated successfully!")
 
+
+# ✅ READ CSV
 def read_portfolio(filename):
     data = []
 
@@ -33,6 +37,8 @@ def read_portfolio(filename):
 
     return data
 
+
+# ✅ ARGUMENTS
 def get_args(args=None):
     parser = argparse.ArgumentParser()
 
@@ -41,6 +47,8 @@ def get_args(args=None):
 
     return parser.parse_args(args)
 
+
+# ✅ GET MARKET DATA
 def get_market_data(symbols):
     url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
 
@@ -57,6 +65,8 @@ def get_market_data(symbols):
 
     return prices
 
+
+# ✅ CALCULATE (🔥 THIS IS THE IMPORTANT PART)
 def calculate(data, prices):
     result = []
 
@@ -67,9 +77,9 @@ def calculate(data, prices):
         if symbol not in prices:
             continue
 
-        units = float(row["units"])
-        cost = float(row["cost"])
-        latest_price = float(prices[symbol])
+        units = row["units"]
+        cost = row["cost"]
+        latest_price = prices[symbol]
 
         book_value = units * cost
         market_value = units * latest_price
@@ -81,15 +91,17 @@ def calculate(data, prices):
             "symbol": symbol,
             "units": units,
             "cost": cost,
-            "latest_price": round(latest_price, 2),
-            "book_value": round(book_value, 2),
-            "market_value": round(market_value, 2),
-            "gain_loss": round(gain_loss, 2),
-            "change": round(change, 2)
+            "latest_price": latest_price,
+            "book_value": book_value,
+            "market_value": market_value,
+            "gain_loss": gain_loss,
+            "change": change   # ❗ NO rounding
         })
 
     return result
 
+
+# ✅ SAVE CSV
 def save_portfolio(data, filename):
     fieldnames = [
         "symbol", "units", "cost",
@@ -103,5 +115,6 @@ def save_portfolio(data, filename):
         writer.writerows(data)
 
 
+# ✅ RUN
 if __name__ == "__main__":
     main()
