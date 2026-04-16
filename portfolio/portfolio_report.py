@@ -18,7 +18,6 @@ def read_portfolio(filename):
 def get_market_data(symbols):
     return {symbol: 100.0 for symbol in symbols}
 
-
 def calculate(portfolio, prices):
     result = []
 
@@ -27,19 +26,31 @@ def calculate(portfolio, prices):
         units = row["units"]
         cost = row["cost"]
 
+        # skip if symbol not in prices
+        if symbol not in prices:
+            continue
+
         market_price = prices[symbol]
+
+        book_value = units * cost
         market_value = units * market_price
-        gain = market_value - cost
+        gain_loss = market_value - book_value
+
+        if book_value != 0:
+            change = gain_loss / book_value
+        else:
+            change = 0
 
         result.append({
             "symbol": symbol,
             "units": units,
-            "cost": cost,
-            "market_price": market_price,
+            "book_value": book_value,
             "market_value": market_value,
-            "gain": gain
+            "gain_loss": gain_loss,
+            "change": change
         })
 
+    return result
     return result
 
 
@@ -52,13 +63,11 @@ def save_portfolio(data, filename):
         writer.writeheader()
         writer.writerows(data)
 
-
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", required=True)
     parser.add_argument("--target", required=True)
     return parser.parse_args()
-
 
 def main():
     args = get_args()
