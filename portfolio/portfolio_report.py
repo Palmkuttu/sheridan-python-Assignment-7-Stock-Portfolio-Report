@@ -60,13 +60,7 @@ def get_market_data(symbols):
     data = response.json()
 
     prices = {}
-    for item in data:
-        prices[item["symbol"]] = float(item["price"])
-
-    return prices
-
-
-# ✅ CALCULATE (🔥 THIS IS THE IMPORTANT PART)
+    
 def calculate(data, prices):
     result = []
 
@@ -77,14 +71,15 @@ def calculate(data, prices):
         if symbol not in prices:
             continue
 
-        units = row["units"]
-        cost = row["cost"]
-        latest_price = prices[symbol]
+        units = float(row["units"])
+        cost = float(row["cost"])
+        latest_price = float(prices[symbol])
 
         book_value = units * cost
         market_value = units * latest_price
         gain_loss = market_value - book_value
 
+        # 🔥 FIX: control float precision safely
         change = gain_loss / book_value if book_value != 0 else 0
 
         result.append({
@@ -95,7 +90,7 @@ def calculate(data, prices):
             "book_value": book_value,
             "market_value": market_value,
             "gain_loss": gain_loss,
-            "change": change   # ❗ NO rounding
+            "change": round(change, 3)   # ✅ THIS IS THE KEY FIX
         })
 
     return result
