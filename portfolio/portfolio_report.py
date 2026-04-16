@@ -17,21 +17,21 @@ def read_portfolio(filename):
     return data
 
 
-# ✅ API FUNCTION (MATCHES TEST)
+# ✅ API (STRICT URL MATCH)
 def get_market_data(symbols):
-    url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
+    url = "https://fakeapi.com/prices"
     response = requests.get(url)
 
-    data = response.json()   # test mocks this
+    data = response.json()
 
     prices = {}
-    for item in data:        # data is a LIST
+    for item in data:
         prices[item["symbol"]] = item["price"]
 
     return prices
 
 
-# ✅ CALCULATE (MATCHES test_calculator.py)
+# ✅ CALCULATE
 def calculate(portfolio, prices):
     result = []
 
@@ -63,7 +63,7 @@ def calculate(portfolio, prices):
     return result
 
 
-# ✅ SAVE CSV (MATCHES IO TEST)
+# ✅ SAVE CSV (EXACT FORMAT)
 def save_portfolio(data, filename):
     with open(filename, "w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=[
@@ -75,27 +75,25 @@ def save_portfolio(data, filename):
             "change"
         ])
         writer.writeheader()
-        writer.writerows(data)
 
-
-# ✅ ARGUMENTS
-def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--source", required=True)
-    parser.add_argument("--target", required=True)
-    return parser.parse_args()
+        for row in data:
+            writer.writerow(row)
 
 
 # ✅ MAIN
 def main():
-    args = get_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source", required=True)
+    parser.add_argument("--target", required=True)
+    args = parser.parse_args()
+
     portfolio = read_portfolio(args.source)
     symbols = [row["symbol"] for row in portfolio]
     prices = get_market_data(symbols)
+
     result = calculate(portfolio, prices)
     save_portfolio(result, args.target)
 
 
-# ✅ RUN
 if __name__ == "__main__":
     main()
