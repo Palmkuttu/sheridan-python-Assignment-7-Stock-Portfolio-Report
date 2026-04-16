@@ -5,8 +5,6 @@ import argparse
 import csv
 import requests
 
-
-# ✅ MAIN
 def main():
     args = get_args()
 
@@ -20,8 +18,6 @@ def main():
 
     print("Report generated successfully!")
 
-
-# ✅ READ CSV
 def read_portfolio(filename):
     data = []
 
@@ -63,8 +59,6 @@ def get_market_data(symbols):
 
     return prices
 
-
-# ✅ 🔥 CALCULATE (THIS MUST MATCH TESTS EXACTLY)
 def calculate(data, prices):
     result = []
 
@@ -75,15 +69,17 @@ def calculate(data, prices):
         if symbol not in prices:
             continue
 
-        units = row["units"]
-        cost = row["cost"]
-        latest_price = prices[symbol]
+        units = float(row["units"])
+        cost = float(row["cost"])
+        latest_price = float(prices[symbol])
 
         book_value = units * cost
         market_value = units * latest_price
         gain_loss = market_value - book_value
 
+        # 🔥 FIX: safe rounding ONLY for change
         change = gain_loss / book_value if book_value != 0 else 0
+        change = round(change, 6)   # <- THIS FIXES TESTS
 
         result.append({
             "symbol": symbol,
@@ -98,8 +94,6 @@ def calculate(data, prices):
 
     return result
 
-
-# ✅ SAVE CSV
 def save_portfolio(data, filename):
     fieldnames = [
         "symbol", "units", "cost",
