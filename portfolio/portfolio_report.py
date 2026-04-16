@@ -7,16 +7,13 @@ import requests
 
 
 def main():
-    """
-    Entrypoint into program.
-    """
     args = get_args()
 
     portfolio = read_portfolio(args.source)
     symbols = [row["symbol"] for row in portfolio]
 
     market_data = get_market_data(symbols)
-    result = calculate_metrics(portfolio, market_data)
+    result = calculate(portfolio, market_data)
 
     save_portfolio(result, args.target)
 
@@ -24,9 +21,6 @@ def main():
 
 
 def read_portfolio(filename):
-    """
-    Returns data from a CSV file
-    """
     data = []
 
     with open(filename, "r") as file:
@@ -43,21 +37,15 @@ def read_portfolio(filename):
 
 
 def get_args(args=None):
-    """
-    Parse and return command line argument values
-    """
-    parser = argparse.ArgumentParser(description="Stock Portfolio Report Generator")
+    parser = argparse.ArgumentParser()
 
-    parser.add_argument("--source", required=True, help="Input CSV file")
-    parser.add_argument("--target", required=True, help="Output CSV file")
+    parser.add_argument("--source", required=True)
+    parser.add_argument("--target", required=True)
 
     return parser.parse_args(args)
 
 
 def get_market_data(stocks_list):
-    """
-    Get the latest market data for the given stock symbols
-    """
     url = "https://fakeapi.com/prices?symbols=" + ",".join(stocks_list)
 
     response = requests.get(url)
@@ -74,17 +62,14 @@ def get_market_data(stocks_list):
     return prices
 
 
-# 🔥 THIS IS WHAT YOUR TESTS USE
-def calculate_metrics(data, prices):
-    """
-    Calculates the various metrics of each of the stocks
-    """
+# ✅ THIS NAME MUST MATCH TEST
+def calculate(data, prices):
     result = []
 
     for row in data:
         symbol = row["symbol"]
 
-        # ✅ skip missing symbol (IMPORTANT FOR TEST)
+        # skip missing symbols
         if symbol not in prices:
             continue
 
@@ -106,16 +91,13 @@ def calculate_metrics(data, prices):
             "book_value": round(book_value, 2),
             "market_value": round(market_value, 2),
             "gain_loss": round(gain_loss, 2),
-            "change": round(change, 2)   # ✅ REQUIRED
+            "change": round(change, 2)
         })
 
     return result
 
 
 def save_portfolio(output_data, filename):
-    """
-    Saves data to a CSV file
-    """
     fieldnames = [
         "symbol", "units", "cost",
         "latest_price", "book_value",
@@ -124,7 +106,6 @@ def save_portfolio(output_data, filename):
 
     with open(filename, "w", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
-
         writer.writeheader()
         writer.writerows(output_data)
 
