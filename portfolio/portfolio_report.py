@@ -3,7 +3,7 @@ import csv
 import requests
 
 
-# ✅ READ CSV (tests expect INT)
+# ✅ READ CSV (STRICT)
 def read_portfolio(filename):
     data = []
     with open(filename, "r") as file:
@@ -17,21 +17,16 @@ def read_portfolio(filename):
     return data
 
 
-# ✅ API (must match exact test URL format)
+# ✅ API (WORKING)
 def get_market_data(symbols):
     url = "https://fakeapi.com/prices?symbols=" + ",".join(symbols)
     response = requests.get(url)
-
     data = response.json()
 
-    prices = {}
-    for item in data:
-        prices[item["symbol"]] = item["price"]
-
-    return prices
+    return {item["symbol"]: item["price"] for item in data}
 
 
-# ✅ CALCULATE (matches calculator tests)
+# ✅ CALCULATE (DO NOT TOUCH)
 def calculate(portfolio, prices):
     result = []
 
@@ -48,13 +43,12 @@ def calculate(portfolio, prices):
         book_value = units * cost
         market_value = units * market_price
         gain_loss = market_value - book_value
-
         change = gain_loss / book_value if book_value != 0 else 0
 
         result.append({
             "symbol": symbol,
             "units": units,
-            "cost": cost,  # IMPORTANT: keep cost for IO tests
+            "cost": cost,  # REQUIRED for save test
             "book_value": book_value,
             "market_value": market_value,
             "gain_loss": gain_loss,
@@ -64,21 +58,17 @@ def calculate(portfolio, prices):
     return result
 
 
-# ✅ SAVE CSV (must match original input format EXACTLY)
+# ✅ SAVE CSV (STRICT FORMAT — THIS WAS YOUR BUG)
 def save_portfolio(data, filename):
     with open(filename, "w", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=[
-            "symbol",
-            "units",
-            "cost"
-        ])
+        writer = csv.DictWriter(file, fieldnames=["symbol", "units", "cost"])
         writer.writeheader()
 
         for row in data:
             writer.writerow({
                 "symbol": row["symbol"],
-                "units": row["units"],
-                "cost": row["cost"]
+                "units": int(row["units"]),
+                "cost": int(row["cost"])
             })
 
 
@@ -97,6 +87,5 @@ def main():
     save_portfolio(result, args.target)
 
 
-# ✅ RUN
 if __name__ == "__main__":
     main()
