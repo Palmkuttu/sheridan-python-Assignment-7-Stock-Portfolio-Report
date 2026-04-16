@@ -1,7 +1,7 @@
+import argparse
 import csv
 
 
-# ✅ READ CSV
 def read_portfolio(filename):
     data = []
     with open(filename, "r") as file:
@@ -15,12 +15,10 @@ def read_portfolio(filename):
     return data
 
 
-# ✅ MARKET DATA
 def get_market_data(symbols):
     return {symbol: 100.0 for symbol in symbols}
 
 
-# ✅ CALCULATE
 def calculate(portfolio, prices):
     result = []
 
@@ -45,27 +43,32 @@ def calculate(portfolio, prices):
     return result
 
 
-# ✅ SAVE CSV
 def save_portfolio(data, filename):
     with open(filename, "w", newline="") as file:
-        fieldnames = [
-            "symbol",
-            "units",
-            "cost",
-            "market_price",
-            "market_value",
-            "gain"
-        ]
-
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer = csv.DictWriter(file, fieldnames=[
+            "symbol", "units", "cost",
+            "market_price", "market_value", "gain"
+        ])
         writer.writeheader()
         writer.writerows(data)
 
 
-# ✅ OPTIONAL MAIN (SAFE)
-def main(source, target):
-    portfolio = read_portfolio(source)
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source", required=True)
+    parser.add_argument("--target", required=True)
+    return parser.parse_args()
+
+
+def main():
+    args = get_args()
+    portfolio = read_portfolio(args.source)
     symbols = [row["symbol"] for row in portfolio]
     prices = get_market_data(symbols)
     result = calculate(portfolio, prices)
-    save_portfolio(result, target)
+    save_portfolio(result, args.target)
+
+
+if __name__ == "__main__":
+    main()
+    
